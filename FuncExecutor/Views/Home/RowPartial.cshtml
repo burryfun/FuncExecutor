@@ -1,0 +1,37 @@
+﻿@using FuncExecutor.Models.ViewModels
+@model RowDataViewModel
+
+<div class="row">
+    <label class="col-3 col-form-label text-start" id=@String.Concat("indicator_code-", Model.IndicatorId)>
+        @Model.IndicatorCode
+    </label>
+    <label class="col-3 col-form-label text-start" id=@String.Concat("indicator-", Model.IndicatorId)>
+        @Model.IndicatorDescription
+    </label>
+    <label class="col-3 col-form-label text-start" id=@String.Concat("indicator_type-", Model.IndicatorId)>
+        @Model.IndicatorTypeDescr
+    </label>
+    @if (Model.IndicatorTypeDescr == "Func")
+    {
+        <div class="col-3">
+            <input class="form-control @Model.IndicatorTypeDescr"
+               id=@String.Concat("value-", Model.ValueId)
+               type="text"
+               value="@Model.Value"
+               style="text-align:right"
+               readonly />
+        </div>
+
+    }
+    else
+    {
+        <div class="col-3">
+            <input class="form-control @Model.IndicatorTypeDescr"
+               id=@String.Concat("value-", Model.ValueId)
+               value="@Model.Value"
+               type="text"
+               style="text-align:right" />
+        </div>
+
+    }
+</div>

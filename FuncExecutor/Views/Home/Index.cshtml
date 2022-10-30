@@ -1,0 +1,152 @@
+﻿@using FuncExecutor.Models.ViewModels
+@{
+    ViewData["Title"] = "Home Page";
+}
+@model List<RowDataViewModel>
+
+<div class="text-center">
+    <div class="row justify-content-center">
+        <form class="card p-3 bg-light col-10 gap-2" id="main-form">
+            <div>
+                <p class="form-name fs-3">@Model[0].FormName</p>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </div>
+            <div class="row">
+                <label class="col-3 col-form-label text-start">
+                    Имя индикатора
+                </label>
+                <label class="col-3 col-form-label text-start">
+                    Описание индикатора
+                </label>
+                <label class="col-3 col-form-label text-start">
+                    Тип индикатора
+                </label>
+                <label class="col-3 col-form-label text-start">
+                    Значение
+                </label>
+            </div>
+            @foreach (var row in Model)
+            {
+                await Html.RenderPartialAsync("RowPartial", row);
+            }
+        </form>
+    </div>
+
+    @{
+        await Html.RenderPartialAsync("CreateIndicatorPartial");
+    }
+
+</div>
+
+@section scripts {
+<script>
+
+    // Подстановка подготовленной формулы и расчет
+    document.forms["main-form"].querySelectorAll("input").forEach(input => input.addEventListener("input", () => {
+        @foreach(var row in Model) {
+            if (row.IndicatorTypeDescr == "Func" && !String.IsNullOrEmpty(row.IndicatorFunc)) {
+                @Html.Raw("document.getElementById('value-" + row.ValueId + "').value = parseFloat((" + row.IndicatorFunc + ").toFixed(6));");
+            }
+        }
+    }));
+
+    // Функция отправки данных формы значений
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+
+        const targetForm = event.currentTarget;
+
+        const formName = targetForm.querySelector(".form-name").textContent;
+        const indicators = targetForm.querySelectorAll("[id^='indicator-']");
+        const values = targetForm.querySelectorAll("[id^='value-']");
+
+        const formData = {
+            "formName": "",
+            "rows": []
+        };
+
+        formData.formName = formName;
+
+        for(let i = 0; i != indicators.length; i++) {
+
+            const row = {
+                indicatorId: indicators[i].id.replace("indicator-", ""),
+                value: parseFloat(values[i].value.replace(",", "."))
+            };
+
+            formData.rows.push(row);
+        }
+
+        const formDataJson = JSON.stringify(formData);
+
+        try {
+            const response = await fetch("/save-form", {
+                method:'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body:formDataJson
+            })
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    // Функция добавления показателя
+    const handleAddIndicator = async (event) => {
+        event.preventDefault();
+
+        const indicatorCode = document.querySelector("#indicator-code-input").value;
+        const indicatorDescription = document.querySelector("#indicator-description-input").value;
+        const indicatorType = document.querySelector("#indicator-type-input").value;
+        const indicatorFunc = document.querySelector("#indicator-func-input").value;
+
+        if (indicatorCode == "") {
+            console.error("Indicator code cannot be empty");
+            return;
+        }
+
+        const indicatorRequest = {
+            "code": indicatorCode,
+            "description": indicatorDescription,
+            "typeDescr": indicatorType,
+            "func": indicatorFunc,
+        };
+
+        const indicatorRequestJson = JSON.stringify(indicatorRequest);
+
+        try {
+            const response = await fetch("/add-indicator", {
+                method:'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body:indicatorRequestJson
+            })
+        } catch(e) {
+            console.error(e);
+        }
+
+        window.location.reload();
+    }
+
+    // Функция проверки выбранного типа показателя
+    const handleCheckIndicatorType = (event) => {
+        if (document.querySelector("#indicator-type-input").value == "Manual") {
+            document.querySelector("#indicator-func-input").setAttribute("readonly", true);
+        } else {
+            document.querySelector("#indicator-func-input").removeAttribute("readonly");
+        }
+    }
+
+    document.querySelector("#main-form").addEventListener("submit", handleFormSubmit);
+
+    document.querySelector("#add-indicator").addEventListener("click", handleAddIndicator);
+
+    window.addEventListener("load", handleCheckIndicatorType);
+    document.querySelector("#indicator-type-input").addEventListener("change", handleCheckIndicatorType);
+
+</script>
+}

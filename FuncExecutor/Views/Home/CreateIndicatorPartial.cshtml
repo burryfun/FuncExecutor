@@ -1,0 +1,51 @@
+﻿<div class="row justify-content-center">
+    <form class="card p-3 col-10 bg-light3 gap-2">
+        <div class="row">
+            <label class="col-3 col-form-label text-start">
+                Имя индикатора
+            </label>
+            <label class="col-3 col-form-label text-start">
+                Описание индикатора
+            </label>
+            <label class="col-3 col-form-label text-start">
+                Тип индикатора
+            </label>
+            <label class="col-3 col-form-label text-start">
+                Формула
+            </label>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <input class="form-control"
+                       id="indicator-code-input"
+                       type="text"
+                       value=""
+                       required />
+            </div>
+            <div class="col-3">
+                <input class="form-control"
+                       id="indicator-description-input"
+                       value=""
+                       type="text" />
+            </div>
+            <div class="col-3">
+                <select class="form-select"
+                        id="indicator-type-input">
+                    <option value="Manual">Ручной ввод</option>
+                    <option value="Func">Формула</option>
+                </select>
+            </div>
+            <div class="col-3">
+                <input class="form-control"
+                       id="indicator-func-input"
+                       value=""
+                       type="text" />
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-success" id="add-indicator">
+                Добавить
+            </button>
+        </div>
+    </form>
+</div>
